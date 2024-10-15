@@ -36,6 +36,7 @@ python s2_term_trans.py
 ## 1.2 term和vector召回
 ```bash
 cd offline/recall/
+conda activate rsppl
 python s1_term_recall.py
 python s2_vector_recall.py
 ```
@@ -46,6 +47,7 @@ vector召回使用FM，仅使用userid和itemid两个特征，AUC为0.8081。训
 ## 1.3 特征工程与DeepFM排序
 ```bash
 cd offline/rank/
+conda activate rsppl
 python s1_feature_engi.py
 python s2_model_train.py
 ```
@@ -75,6 +77,7 @@ docker run --name redis -p 6379:6379 -d redis:6.0.0
 代码在导入数据后还会以某个用户为例进行数据校验，如果有下图输出，代表校验成功。
 ```bash
 cd offline_to_online/recall/
+conda activate rsppl
 python s1_user_to_redis.py
 ```
 ![img_redis1.png](pic/img_redis1.png)
@@ -97,6 +100,7 @@ docker start es8
 代码在导入数据后还会以某个term和vector为例进行数据校验，如果有下图输出，代表校验成功。
 ```bash
 cd offline_to_online/recall/
+conda activate rsppl
 python s2_item_to_es.py
 ```
 ![img_es2.png](pic/img_es2.png)
@@ -107,6 +111,7 @@ python s2_item_to_es.py
 将特征文件由csv转为parquet格式以满足Feast的要求。
 ```bash
 cd offline_to_online/rank/
+conda activate rsppl
 python s1_feature_to_feast.py
 ```
 新启动一个终端（称为终端2），先切换到预先建好的仓库目录下，再启动docker，-it进入容器内部终端，-v将当前目录的特征配置和数据同步至docker内。
@@ -145,6 +150,7 @@ curl -X POST \
 将pytorch模型导出为onnx格式。
 ```bash
 cd offline_to_online/rank/
+conda activate rsppl
 python s2_model_to_triton.py
 ```
 新启动一个终端（称为终端3），先切换到预先建好的仓库目录下，再启动docker，-v将当前目录的模型同步至docker内，会有下图输出，8000是http接口，8001是grpc接口。
@@ -156,6 +162,7 @@ docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 -v $(pwd)/:/models/ nvcr.io/
 回到终端1运行以下命令，测试模型线下与线上打分是否一致。  
 ```bash
 cd offline_to_online/rank/
+conda activate rsppl
 python s3_check_offline_and_online.py
 ```
 如图，线下与线下打分完全一致，测试通过。    
@@ -170,7 +177,7 @@ Python常用的web框架有Django, Flask, FastAPI, Tornado等，都可以实现R
 ```bash
 conda activate rsppl
 cd online/main
-flask --app s1_server.py run --host=0.0.0.0
+flask --app s1_server.py run --host=0.0.0.0 --port=8080
 ```
 ![img_flask1.png](pic/img_flask1.png)  
 ## 3.2 client调用
